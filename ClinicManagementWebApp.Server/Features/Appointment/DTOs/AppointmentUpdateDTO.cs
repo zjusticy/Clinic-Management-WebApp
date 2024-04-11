@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace ClinicManagementWebApp.Server.Features.Appointment.DTOs
 {
@@ -6,7 +7,8 @@ namespace ClinicManagementWebApp.Server.Features.Appointment.DTOs
     {
         public int Id { get; set; }
 
-        [MaxLength(300)]
+        [DisplayName("Prescription")]
+        [StringLength(300, ErrorMessage = "The length of the {0} must be less than {1}")]
         public string? Prescription { get; set; }
     }
 }

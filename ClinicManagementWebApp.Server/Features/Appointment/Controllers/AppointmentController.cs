@@ -2,7 +2,6 @@
 using AutoMapper;
 using ClinicManagementWebApp.Server.Features.Appointment.DTOs;
 using ClinicManagementWebApp.Server.Features.Appointment.Entity;
-using ClinicManagementWebApp.Server.Features.Appointment.Services;
 using ClinicManagementWebApp.Server.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
@@ -12,74 +11,26 @@ namespace ClinicManagementWebApp.Server.Features.Appointment.Controllers
 {
     [Route("api/appointments")]
     [ApiController]
-    public class AppointmentController(IAppointmentRepository appointmentRepository, IMapper mapper,
-        IAppointmentServices appointmentServices) : ControllerBase
+    public class AppointmentController(IAppointmentRepository appointmentRepository, IMapper mapper) : ControllerBase
     {
 
         [Authorize(Policy = "admin")]
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<AppointmentBriefDTO>>> GetAllAppointments()
+        public async Task<ActionResult<IEnumerable<AppointmentBriefDTO>>> GetAllAppointments([FromQuery] int status)
         {
-            var appointmentsEntities = await appointmentRepository.GetAllAsync();
-
-            var appointments = mapper.Map<IEnumerable<AppointmentBriefDTO>>(appointmentsEntities);
-
-            return Ok(appointments);
-        }
-
-        [Authorize(Policy = "patient")]
-        [HttpGet("patient/{userId}", Name = nameof(GetAppointmentsForPatientByUserId))]
-        public async Task<ActionResult<IEnumerable<AppointmentBriefDTO>>> GetAppointmentsForPatientByUserId(Guid userId)
-        {
-            var levelClaim = User.FindFirstValue("level");
-            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            if (levelClaim != "admin" && currentUserId != userId.ToString())
-            {
-                return Unauthorized();
-            }
-
-            var appointmentsEntities = await appointmentServices.GetAppointmentListForPatientByUserIdAsync(userId);
-
-            if (appointmentsEntities == null)
-            {
-                return NotFound();
-            }
+            var appointmentsEntities = await appointmentRepository.GetByStatusAsync(status);
 
             var appointments = mapper.Map<IEnumerable<AppointmentListBriefDTO>>(appointmentsEntities);
 
             return Ok(appointments);
         }
 
-        [Authorize(Policy = "doctor")]
-        [HttpGet("doctor/{userId}", Name = nameof(GetAppointmentsForDoctorByUserId))]
-        public async Task<ActionResult<IEnumerable<AppointmentBriefDTO>>> GetAppointmentsForDoctorByUserId(Guid userId)
-        {
-            var levelClaim = User.FindFirstValue("level");
-            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            if (levelClaim != "admin" && currentUserId != userId.ToString())
-            {
-                return Unauthorized();
-            }
-
-            var appointmentsEntities = await appointmentServices.GetAppointmentListForDoctorByUserIdAsync(userId);
-
-            if (appointmentsEntities == null)
-            {
-                return NotFound();
-            }
-
-            var appointments = mapper.Map<IEnumerable<AppointmentListBriefDTO>>(appointmentsEntities);
-
-            return Ok(appointments);
-        }
 
         [HttpGet("{id}", Name = nameof(GetAppointmentById))]
         public async Task<ActionResult<AppointmentDetailDTO>> GetAppointmentById(int id)
         {
             var appoitmentEntity = await appointmentRepository.GetByIdAsync(id);
-            var appointment = mapper.Map<AppointmentDetailDTO>(appoitmentEntity);
+            var appointment = mapper.Map<AppointmentListBriefDTO>(appoitmentEntity);
             return Ok(appointment);
         }
 

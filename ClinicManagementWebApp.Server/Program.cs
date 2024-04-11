@@ -1,4 +1,4 @@
-using ClinicManagementWebApp.Server.Features.Appointment.Services;
+using ClinicManagementWebApp.Server.Features.User.Services;
 using ClinicManagementWebApp.Server.Features.Users.Entity;
 using ClinicManagementWebApp.Server.Infrastructure;
 using ClinicManagementWebApp.Server.Infrastructure.Repositories;
@@ -8,6 +8,21 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.WebHost.ConfigureKestrel((context, serverOptions) =>
+{
+    serverOptions.Listen(System.Net.IPAddress.Any, 5000);
+    serverOptions.Listen(System.Net.IPAddress.Any, 5001, listenOptions =>
+    {
+        listenOptions.UseHttps();
+    });
+});
+
+builder.Services.Configure<IdentityOptions>(options =>
+{
+    options.Password.RequireDigit = true;
+    options.Password.RequireLowercase = true;
+    options.Password.RequiredLength = 8;
+});
 
 builder.Services.AddControllers().AddNewtonsoftJson();
 builder.Services.AddDbContext<AppDbContext>(opt =>
@@ -43,7 +58,7 @@ builder.Services.AddAuthorization(options =>
 });
 
 builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
-builder.Services.AddScoped<IAppointmentServices, AppointmentServices>();
+builder.Services.AddScoped<IUserServices, UserServices>();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
@@ -63,6 +78,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+/*app.UseCors(MyAllowSpecificOrigins);*/
 
 app.UseAuthentication();
 app.UseAuthorization();

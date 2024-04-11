@@ -17,5 +17,7 @@ namespace ClinicManagementWebApp.Server.Features.Appointment.DTOs
         public byte AppointmentStatus { get; set; }
 
         public string? ReasonForVisit { get; set; }
+
+        public string? Prescription { get; set; }
     }
 }

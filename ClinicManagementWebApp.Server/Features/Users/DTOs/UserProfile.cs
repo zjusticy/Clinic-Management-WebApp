@@ -11,6 +11,7 @@ namespace ClinicManagementWebApp.Server.Features.Users.DTOs
             CreateMap<UserRegisterDTO, UserModel>();
             CreateMap<UserModel, UserBriefDTO>();
             CreateMap<UserModel, UserIdNameDTO>();
+            CreateMap<UserRoleDTO, UserBriefDTO>();
         }
 
     }

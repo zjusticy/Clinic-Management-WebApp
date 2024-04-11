@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-
-namespace ClinicManagementWebApp.Server.Features.Users.DTOs
+﻿namespace ClinicManagementWebApp.Server.Features.Users.DTOs
 {
     public class UserBriefDTO
     {
@@ -18,6 +16,9 @@ namespace ClinicManagementWebApp.Server.Features.Users.DTOs
 
         public byte Gender { get; set; }
 
-        public ICollection<IdentityRole> Roles { get; set; } = [];
+        public byte Status { get; set; }
+
+        public string Role { get; set; } = string.Empty;
+
     }
 }

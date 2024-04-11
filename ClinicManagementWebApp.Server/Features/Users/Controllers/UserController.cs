@@ -2,6 +2,9 @@
 using System.Diagnostics;
 using System.Security.Claims;
 using AutoMapper;
+using ClinicManagementWebApp.Server.Features.Appointment.DTOs;
+using ClinicManagementWebApp.Server.Features.Appointment.Entity;
+using ClinicManagementWebApp.Server.Features.User.Services;
 using ClinicManagementWebApp.Server.Features.Users.DTOs;
 using ClinicManagementWebApp.Server.Features.Users.Entity;
 using Microsoft.AspNetCore.Authentication.BearerToken;
@@ -16,20 +19,80 @@ namespace ClinicManagementWebApp.Server.Features.Users.Controllers
 {
     [Route("api/users")]
     [ApiController]
-    public class UserController(IMapper _mapper, UserManager<UserModel> userManager) : ControllerBase
+    public class UserController(IMapper mapper, UserManager<UserModel> userManager, SignInManager<UserModel> signInManager,
+         IUserServices userServices) : ControllerBase
     {
         private static readonly EmailAddressAttribute _emailAddressAttribute = new();
 
         [Authorize(Policy = "admin")]
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<UserBriefDTO>>> GetUsers()
+        public async Task<ActionResult<IEnumerable<UserBriefDTO>>> GetUsers([FromQuery] string userType)
         {
+            ICollection<UserModel> usersList;
 
-            var usersList = await userManager.Users.ToListAsync();
+            if (userType != null)
+            {
+                usersList = await userManager.GetUsersForClaimAsync(new Claim("level", userType));
+            }
 
-            var users = _mapper.Map<IEnumerable<UserBriefDTO>>(usersList);
+            else usersList = await userManager.Users.ToListAsync();
+
+            var users = mapper.Map<IEnumerable<UserBriefDTO>>(usersList);
 
             return Ok(users);
+        }
+
+        [Authorize(Policy = "patient")]
+        [Route("doctors")]
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<UserBriefDTO>>> GetDoctors()
+        {
+
+            var usersList = await userManager.GetUsersForClaimAsync(new Claim("level", "doctor"));
+
+            var users = mapper.Map<IEnumerable<UserBriefDTO>>(usersList);
+
+            return Ok(users);
+        }
+
+        [Authorize]
+        [Route("me")]
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<UserBriefDTO>>> GetUserByCookie()
+        {
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (userId == null)
+            {
+                return NotFound();
+            }
+
+            var user = await userManager.FindByIdAsync(userId);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var levelClaim = User.FindFirstValue("level");
+
+            if (levelClaim == null)
+            {
+                return NotFound();
+            }
+
+            var userRole = new UserRoleDTO()
+            {
+                Role = levelClaim
+            };
+
+            var userOutput = new UserBriefDTO();
+
+            mapper.Map(user, userOutput);
+            mapper.Map(userRole, userOutput);
+
+            return Ok(userOutput);
         }
 
         [Authorize(Policy = "doctor")]
@@ -47,10 +110,24 @@ namespace ClinicManagementWebApp.Server.Features.Users.Controllers
             return Ok(user);
         }
 
+        [Authorize]
+        [Route("logout")]
+        [HttpPost]
+        public async Task<Results<Ok, ProblemHttpResult>> Logout([FromBody] object empty)
+        {
+            if (empty != null)
+            {
+                await signInManager.SignOutAsync();
+                return TypedResults.Ok();
+            }
+
+            return TypedResults.Problem("Unauthorized", statusCode: StatusCodes.Status401Unauthorized);
+        }
+
         [Route("register")]
         [HttpPost]
         public async Task<Results<Ok, ValidationProblem>> Register(
-            [FromBody] UserAddOrUpdateDTO registration, [FromServices] IServiceProvider sp)
+            [FromBody] PatientAddOrUpdateDTO registration, [FromServices] IServiceProvider sp)
         {
 
             if (!userManager.SupportsUserEmail)
@@ -67,9 +144,9 @@ namespace ClinicManagementWebApp.Server.Features.Users.Controllers
                 return CreateValidationProblem(IdentityResult.Failed(userManager.ErrorDescriber.InvalidEmail(email)));
             }
 
-            var userRegisterModel = _mapper.Map<UserRegisterDTO>(registration);
+            var userRegisterModel = mapper.Map<UserRegisterDTO>(registration);
 
-            var user = _mapper.Map<UserModel>(userRegisterModel);
+            var user = mapper.Map<UserModel>(userRegisterModel);
 
             await userStore.SetUserNameAsync(user, email, CancellationToken.None);
             await emailStore.SetEmailAsync(user, email, CancellationToken.None);
@@ -108,9 +185,9 @@ namespace ClinicManagementWebApp.Server.Features.Users.Controllers
                 return CreateValidationProblem(IdentityResult.Failed(userManager.ErrorDescriber.InvalidEmail(email)));
             }
 
-            var userRegisterModel = _mapper.Map<UserRegisterDTO>(registration);
+            var userRegisterModel = mapper.Map<UserRegisterDTO>(registration);
 
-            var user = _mapper.Map<UserModel>(userRegisterModel);
+            var user = mapper.Map<UserModel>(userRegisterModel);
 
             await userStore.SetUserNameAsync(user, email, CancellationToken.None);
             await emailStore.SetEmailAsync(user, email, CancellationToken.None);
@@ -161,6 +238,47 @@ namespace ClinicManagementWebApp.Server.Features.Users.Controllers
 
             // The signInManager already produced the needed response in the form of a cookie or bearer token.
             return TypedResults.Empty;
+        }
+
+        [Authorize]
+        [HttpGet("{userId}/appointments", Name = nameof(GetAppointmentsForPatientByUserId))]
+        public async Task<ActionResult<IEnumerable<AppointmentBriefDTO>>> GetAppointmentsForPatientByUserId(Guid userId,
+            [FromQuery] int status, [FromQuery] string? role)
+        {
+            var levelClaim = User.FindFirstValue("level");
+            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (levelClaim == null)
+            {
+                return NotFound();
+            }
+
+            ICollection<AppointmentModel>? appointmentsEntities = null;
+
+            if (levelClaim != "admin" && currentUserId != userId.ToString())
+            {
+                return Unauthorized();
+            }
+
+            if (levelClaim == "admin" && role != null)
+            {
+                appointmentsEntities = await userServices.GetAppointmentListForUserByUserIdAsync(userId, status, role);
+            }
+
+            if (levelClaim == "patient" || levelClaim == "doctor")
+            {
+                appointmentsEntities = await userServices.GetAppointmentListForUserByUserIdAsync(userId, status, levelClaim);
+            }
+
+
+            if (appointmentsEntities == null)
+            {
+                return NotFound();
+            }
+
+            var appointments = mapper.Map<IEnumerable<AppointmentListBriefDTO>>(appointmentsEntities);
+
+            return Ok(appointments);
         }
 
 
