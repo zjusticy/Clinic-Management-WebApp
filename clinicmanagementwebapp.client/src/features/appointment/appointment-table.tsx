@@ -95,16 +95,16 @@ export function AppointmentTable({ status }: { status: number }) {
                 {format(appointment.date, 'yyyy-MM-dd hh:mm a')}
               </TableCell>
               <TableCell className="font-medium">
-                <div
-                  className="px-0 underline text-secondary text-right cursor-pointer"
-                  onClick={() => handleCancelAppointment(appointment.id)}
-                >
-                  {isCancelling ? (
-                    <Icons.spinner className="h-4 w-4 animate-spin" />
-                  ) : (
-                    'Cancel'
-                  )}
-                </div>
+                      {status === 0 && <div
+                          className="px-0 underline text-secondary text-right cursor-pointer"
+                          onClick={() => handleCancelAppointment(appointment.id)}
+                      >
+                          {isCancelling ? (
+                              <Icons.spinner className="h-4 w-4 animate-spin" />
+                          ) : (
+                              'Cancel'
+                          )}
+                      </div>}
               </TableCell>
             </TableRow>
           ))}

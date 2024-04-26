@@ -166,7 +166,7 @@ export function AppointmentListCard({
             </Button>
           )}
 
-          {status === 0 && role === 'patient' && (
+          {/*{status === 0 && role === 'patient' && (
             <Button
               className="ml-auto bg-white text-secondary"
               variant="outline"
@@ -176,7 +176,7 @@ export function AppointmentListCard({
             >
               {editCancelling ? 'X' : 'Cancel'}
             </Button>
-          )}
+          )}*/}
         </div>
         <div className="line-clamp-2 text-xs text-muted-foreground pt-2">
           <span className="font-semibold">Symptom:</span>{' '}
