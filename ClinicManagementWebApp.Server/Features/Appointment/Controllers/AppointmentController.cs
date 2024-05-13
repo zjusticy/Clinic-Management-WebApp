@@ -14,22 +14,23 @@ namespace ClinicManagementWebApp.Server.Features.Appointment.Controllers
     public class AppointmentController(IAppointmentRepository appointmentRepository, IMapper mapper) : ControllerBase
     {
 
-        [Authorize(Policy = "admin")]
+        /* [Authorize(Policy = "admin")]*/
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<AppointmentBriefDTO>>> GetAllAppointments([FromQuery] int status)
+        public async Task<ActionResult<IEnumerable<AppointmentListBriefDTO>>> GetAllAppointments([FromQuery] int status)
         {
             var appointmentsEntities = await appointmentRepository.GetByStatusAsync(status);
 
-            var appointments = mapper.Map<IEnumerable<AppointmentListBriefDTO>>(appointmentsEntities);
+            var appointments = mapper.Map<List<AppointmentListBriefDTO>>(appointmentsEntities);
 
             return Ok(appointments);
         }
 
-
+        [Authorize]
         [HttpGet("{id}", Name = nameof(GetAppointmentById))]
-        public async Task<ActionResult<AppointmentDetailDTO>> GetAppointmentById(int id)
+        public async Task<ActionResult<AppointmentListBriefDTO>> GetAppointmentById(int id)
         {
             var appoitmentEntity = await appointmentRepository.GetByIdAsync(id);
+            Console.WriteLine(appoitmentEntity);
             var appointment = mapper.Map<AppointmentListBriefDTO>(appoitmentEntity);
             return Ok(appointment);
         }

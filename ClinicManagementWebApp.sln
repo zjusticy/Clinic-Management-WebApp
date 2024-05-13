@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34622.214
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClinicManagementWebApp.Server", "ClinicManagementWebApp.Server\ClinicManagementWebApp.Server.csproj", "{5E7CBBB6-B06D-480B-ADB0-5B440B955AA7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClinicManagementWebApp.Server", "ClinicManagementWebApp.Server\ClinicManagementWebApp.Server.csproj", "{5E7CBBB6-B06D-480B-ADB0-5B440B955AA7}"
 EndProject
-Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "clinicmanagementwebapp.client", "clinicmanagementwebapp.client\clinicmanagementwebapp.client.esproj", "{342AE954-0515-4F0D-AB9A-19768A337F88}"
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "ClinicManagementWebApp.Client", "clinicmanagementwebapp.client\ClinicManagementWebApp.Client.esproj", "{342AE954-0515-4F0D-AB9A-19768A337F88}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClinicManagementWebApp.Tests", "ClinicManagementWebApp.Tests\ClinicManagementWebApp.Tests.csproj", "{A91E922C-8DC6-4130-BD42-F8ED866B69C4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,6 +25,10 @@ Global
 		{342AE954-0515-4F0D-AB9A-19768A337F88}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{342AE954-0515-4F0D-AB9A-19768A337F88}.Release|Any CPU.Build.0 = Release|Any CPU
 		{342AE954-0515-4F0D-AB9A-19768A337F88}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{A91E922C-8DC6-4130-BD42-F8ED866B69C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A91E922C-8DC6-4130-BD42-F8ED866B69C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A91E922C-8DC6-4130-BD42-F8ED866B69C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A91E922C-8DC6-4130-BD42-F8ED866B69C4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
