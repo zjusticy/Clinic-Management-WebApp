@@ -5,7 +5,7 @@ VisualStudioVersion = 17.9.34622.214
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClinicManagementWebApp.Server", "ClinicManagementWebApp.Server\ClinicManagementWebApp.Server.csproj", "{5E7CBBB6-B06D-480B-ADB0-5B440B955AA7}"
 EndProject
-Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "ClinicManagementWebApp.Clien", "clinicmanagementwebapp.client\ClinicManagementWebApp.Clien.esproj", "{342AE954-0515-4F0D-AB9A-19768A337F88}"
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "ClinicManagementWebApp.Client", "clinicmanagementwebapp.client\ClinicManagementWebApp.Client.esproj", "{342AE954-0515-4F0D-AB9A-19768A337F88}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClinicManagementWebApp.Tests", "ClinicManagementWebApp.Tests\ClinicManagementWebApp.Tests.csproj", "{A91E922C-8DC6-4130-BD42-F8ED866B69C4}"
 EndProject
