@@ -39,7 +39,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\clinicmanagementwebapp.client\ClinicManagementWebApp.Client.esproj">
+    <ProjectReference Include="..\clinicmanagementwebapp.client\ClinicManagementWebApp.Clien.esproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
   </ItemGroup>
