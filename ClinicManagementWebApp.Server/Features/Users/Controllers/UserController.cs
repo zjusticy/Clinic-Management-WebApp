@@ -19,7 +19,7 @@ namespace ClinicManagementWebApp.Server.Features.Users.Controllers
 {
     [Route("api/users")]
     [ApiController]
-    public class UserController(IMapper mapper, UserManager<UserModel> userManager, SignInManager<UserModel> signInManager,
+    public class UserController(IMapper mapper, UserManager<UserModel> userManager, IUserStore<UserModel> userStore, SignInManager<UserModel> signInManager,
          IUserServices userServices) : ControllerBase
     {
         private static readonly EmailAddressAttribute _emailAddressAttribute = new();
@@ -127,7 +127,7 @@ namespace ClinicManagementWebApp.Server.Features.Users.Controllers
         [Route("register")]
         [HttpPost]
         public async Task<Results<Ok, ValidationProblem>> Register(
-            [FromBody] PatientAddOrUpdateDTO registration, [FromServices] IServiceProvider sp)
+            [FromBody] PatientAddOrUpdateDTO registration)
         {
 
             if (!userManager.SupportsUserEmail)
@@ -135,7 +135,6 @@ namespace ClinicManagementWebApp.Server.Features.Users.Controllers
                 throw new NotSupportedException($"{nameof(Register)} requires a user store with email support.");
             }
 
-            var userStore = sp.GetRequiredService<IUserStore<UserModel>>();
             var emailStore = (IUserEmailStore<UserModel>)userStore;
             var email = registration.Email;
 

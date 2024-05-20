@@ -14,7 +14,7 @@ namespace ClinicManagementWebApp.Server.Features.Appointment.Controllers
     public class AppointmentController(IAppointmentRepository appointmentRepository, IMapper mapper) : ControllerBase
     {
 
-        /* [Authorize(Policy = "admin")]*/
+        [Authorize(Policy = "admin")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<AppointmentListBriefDTO>>> GetAllAppointments([FromQuery] int status)
         {

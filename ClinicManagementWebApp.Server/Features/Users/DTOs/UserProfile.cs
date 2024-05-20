@@ -8,6 +8,7 @@ namespace ClinicManagementWebApp.Server.Features.Users.DTOs
         public UserProfile()
         {
             CreateMap<UserAddOrUpdateDTO, UserRegisterDTO>();
+            CreateMap<PatientAddOrUpdateDTO, UserRegisterDTO>();
             CreateMap<UserRegisterDTO, UserModel>();
             CreateMap<UserModel, UserBriefDTO>();
             CreateMap<UserModel, UserIdNameDTO>();

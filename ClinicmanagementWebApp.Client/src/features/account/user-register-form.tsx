@@ -131,12 +131,10 @@ export function UserRegisterForm({
       email: formData.email,
       ...(role === 'patient'
         ? {
-            dateOfBirth: new Date(
-              `${formData.year}-${formData.month}-${formData.day}`
-            ),
+              dateOfBirth: `${formData.year}-${formData.month}-${formData.day}`
           }
         : {}),
-    };
+      };
 
     fetch(
       role === 'patient' ? '/api/users/register' : '/api/users/doctor/register',

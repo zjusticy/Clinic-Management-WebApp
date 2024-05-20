@@ -8,7 +8,7 @@ namespace ClinicManagementWebApp.Server.Features.Users.DTOs
 
         [DisplayName("Date of birth")]
         [Required(ErrorMessage = "{0} is required")]
-        public DateTime? DateOfBirth { get; set; }
+        public string? DateOfBirth { get; set; }
 
     }
 }

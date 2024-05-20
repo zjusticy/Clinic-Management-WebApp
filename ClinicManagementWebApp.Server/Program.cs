@@ -13,7 +13,7 @@ builder.Services.AddControllers().AddNewtonsoftJson();
 builder.WebHost.ConfigureKestrel((context, serverOptions) =>
 {
     serverOptions.Listen(System.Net.IPAddress.Any, 5000);
-    serverOptions.Listen(System.Net.IPAddress.Any, 5001, listenOptions =>
+    serverOptions.Listen(System.Net.IPAddress.Any, 7222, listenOptions =>
     {
         listenOptions.UseHttps();
     });
