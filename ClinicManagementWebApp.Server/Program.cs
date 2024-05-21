@@ -9,7 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers().AddNewtonsoftJson();
 
-// Add services to the container.
+/*// Add services to the container.
 builder.WebHost.ConfigureKestrel((context, serverOptions) =>
 {
     serverOptions.Listen(System.Net.IPAddress.Any, 5000);
@@ -17,7 +17,7 @@ builder.WebHost.ConfigureKestrel((context, serverOptions) =>
     {
         listenOptions.UseHttps();
     });
-});
+});*/
 
 builder.Services.Configure<IdentityOptions>(options =>
 {
