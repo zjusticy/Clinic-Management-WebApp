@@ -59,13 +59,13 @@ namespace ClinicManagementWebApp.Tests
 
             var request = new
             {
-                FirstName = "TUTUTU",
+                FirstName = "HHII",
                 LastName = "sting",
-                Email = "test231@test.com",
+                Email = "test246@test.com",
                 PhoneNumber = "234",
                 Gender = 1,
                 Password = "1234Qwe[",
-                DateOfBirth = "2024-05-10T18:22:10.230Z"
+                DateOfBirth = "2024-05-10"
             };
 
             var jsonRequest = JsonSerializer.Serialize(request);
