@@ -10,7 +10,7 @@ namespace ClinicManagementWebApp.Server.Features.Users.DTOs
         [Required(ErrorMessage = "{0} is required")]
         public string FirstName { get; set; } = string.Empty;
 
-        [DisplayName("First name")]
+        [DisplayName("Last name")]
         [StringLength(50, ErrorMessage = "The length of the {0} must be less than {1}")]
         [Required(ErrorMessage = "{0} is required")]
         public string LastName { get; set; } = string.Empty;
