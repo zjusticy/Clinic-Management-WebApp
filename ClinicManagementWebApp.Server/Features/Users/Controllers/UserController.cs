@@ -26,7 +26,7 @@ namespace ClinicManagementWebApp.Server.Features.Users.Controllers
 
         [Authorize(Policy = "admin")]
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<UserBriefDTO>>> GetUsers([FromQuery] string userType)
+        public async Task<ActionResult<IEnumerable<UserBriefDTO>>> GetUsers([FromQuery] string? userType)
         {
             ICollection<UserModel> usersList;
 

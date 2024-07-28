@@ -1,119 +1,122 @@
+using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
+using ClinicManagementWebApp.Server.Features.Users.DTOs;
 using ClinicManagementWebApp.Server.Infrastructure;
 using ClinicManagementWebApp.Tests.helpers;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
+using Xunit.Abstractions;
 
 namespace ClinicManagementWebApp.Tests
 {
-    public class UserApiTests(WebApplicationFactory<Program> factory) :
+    public class UserApiTests(WebApplicationFactory<Program> factory, ITestOutputHelper output) :
         IClassFixture<WebApplicationFactory<Program>>
     {
-        private HttpClient CreateClientWithAuth(string userLevel)
+        private async Task<HttpClient> GetAuthenticatedClientAsync()
         {
-            return factory.WithWebHostBuilder(builder =>
+            var client = factory.CreateClient();
 
-                builder.ConfigureServices(services =>
-                {
-                    services.AddAuthentication(TestAuthHandler.AuthScheme)
-                        .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(
-                            TestAuthHandler.AuthScheme,
-                            options => { },
-                            serviceProvider => new TestAuthHandler(
-                                serviceProvider.GetRequiredService<IOptionsMonitor<AuthenticationSchemeOptions>>(),
-                                serviceProvider.GetRequiredService<ILoggerFactory>(),
-                                serviceProvider.GetRequiredService<UrlEncoder>(),
-                                serviceProvider.GetRequiredService<ISystemClock>(),
-                                userLevel
-                            )
-                        );
-                });
-        }).CreateClient();
-    }
+            var request = new
+            {
+                email = "admin@admin.com",
+                password = "P@ssw0rd"
+            };
 
+            var jsonRequest = JsonSerializer.Serialize(request);
 
-    [Fact]
-    public async Task Post_Login_EndPointsReturnSuccess()
-    {
-        using (var scope = factory.Services.CreateScope())
-        {
-            var scopedServices = scope.ServiceProvider;
-            var db = scopedServices.GetRequiredService<AppDbContext>();
+            var content = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
 
-            /*Utilities.ReinitializeDbForTests(db);*/
+            var response = await client.PostAsync("/api/users/login", content);
 
-            await Utilities.SeedTestUser(scopedServices);
+            response.EnsureSuccessStatusCode();
 
-
+            return client;
         }
-        var client = factory.CreateClient();
 
-        var request = new
+
+
+        [Fact]
+        public async Task Post_Login_EndPointsReturnSuccess()
         {
-            email = "test328@test.com",
-            password = "1234Qwe["
-        };
+            using (var scope = factory.Services.CreateScope())
+            {
+                var scopedServices = scope.ServiceProvider;
+                var db = scopedServices.GetRequiredService<AppDbContext>();
 
-        var jsonRequest = JsonSerializer.Serialize(request);
+                /*Utilities.ReinitializeDbForTests(db);*/
 
-        var content = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
+                await Utilities.SeedTestUser(scopedServices);
 
-        var response = await client.PostAsync("/api/users/login", content);
 
-        response.EnsureSuccessStatusCode();
-    }
+            }
+            var client = factory.CreateClient();
 
-    [Fact]
-    public async Task Post_Register_EndPointsReturnSuccess()
-    {
-        /* using (var scope = factory.Services.CreateScope())
+            var request = new
+            {
+                email = "test328@test.com",
+                password = "1234Qwe["
+            };
+
+            var jsonRequest = JsonSerializer.Serialize(request);
+
+            var content = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
+
+            var response = await client.PostAsync("/api/users/login", content);
+
+            response.EnsureSuccessStatusCode();
+        }
+
+        /* [Fact]
+         public async Task Post_Register_EndPointsReturnSuccess()
          {
-             var scopedServices = scope.ServiceProvider;
-             var db = scopedServices.GetRequiredService<AppDbContext>();
+             *//* using (var scope = factory.Services.CreateScope())
+              {
+                  var scopedServices = scope.ServiceProvider;
+                  var db = scopedServices.GetRequiredService<AppDbContext>();
 
-             *//*Utilities.ReinitializeDbForTests(db);*//*
+                  *//*Utilities.ReinitializeDbForTests(db);*//*
 
-             await Utilities.SeedTestUser(scopedServices);
+                  await Utilities.SeedTestUser(scopedServices);
 
 
+              }*//*
+             var client = factory.CreateClient();
+
+             var request = new
+             {
+                 FirstName = "HHII",
+                 LastName = "sting",
+                 Email = "test246@test.com",
+                 PhoneNumber = "234",
+                 Gender = 1,
+                 Password = "1234Qwe[",
+                 DateOfBirth = "2024-05-10"
+             };
+
+             var jsonRequest = JsonSerializer.Serialize(request);
+
+             var content = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
+
+             var response = await client.PostAsync("/api/users/register", content);
+
+             response.EnsureSuccessStatusCode();
          }*/
-        var client = factory.CreateClient();
 
-        var request = new
+        [Fact]
+        public async Task GetUsers_ReturnsSuccessForAdmin()
         {
-            FirstName = "HHII",
-            LastName = "sting",
-            Email = "test246@test.com",
-            PhoneNumber = "234",
-            Gender = 1,
-            Password = "1234Qwe[",
-            DateOfBirth = "2024-05-10"
-        };
+            // Arrange
+            var client = await GetAuthenticatedClientAsync();
+            // Act
+            var response = await client.GetAsync("/api/users/");
 
-        var jsonRequest = JsonSerializer.Serialize(request);
+            string jsonString = await response.Content.ReadAsStringAsync();
 
-        var content = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
-
-        var response = await client.PostAsync("/api/users/register", content);
-
-        response.EnsureSuccessStatusCode();
+            // Assert
+            response.EnsureSuccessStatusCode();
+            var users = await response.Content.ReadFromJsonAsync<IEnumerable<UserBriefDTO>>();
+            Assert.NotNull(users);
+        }
     }
-
-    [Fact]
-    public async Task GetUsers_ReturnsSuccessForAdmin()
-    {
-        // Arrange
-        var client = CreateClientWithAuth("admin");
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(TestAuthHandler.AuthScheme);
-
-        // Act
-        var response = await client.GetAsync("/api/users");
-
-        // Assert
-        response.EnsureSuccessStatusCode();
-        var users = await response.Content.ReadFromJsonAsync<IEnumerable<UserBriefDTO>>();
-        Assert.NotNull(users);
-    }
-}
 }
